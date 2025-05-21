@@ -1,5 +1,5 @@
 {
-  "name": "autenticator_sql",
+  "name": "aula_node",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
@@ -7,10 +7,12 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "express": "^5.1.0",
     "express-handlebars": "^8.0.1",
-    "mysql2": "^3.14.1"
-  }
+    "mysql2": "^3.14.1",
+    "nodemon": "^3.1.10"
+  },
+  "keywords": [],
+  "description": ""
 }

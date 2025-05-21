@@ -18,7 +18,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'autenticator'
+    database: 'bd1905'
 });
 
 db.connect((err) => {
@@ -37,12 +37,14 @@ app.get('/', (req, res) => {
 // Rota de cadastro - insere no banco
 app.post('/cadastrar', (req, res) => {
     const nome = req.body.nome;
-    const materia = req.body.materia;
+    const senha = req.body.senha;
+    const email = req.body.email;
+    const acesso = 0;
 
-    console.log('Recebido:', { nome, materia });
+    console.log('Recebido:', { nome, senha, email, acesso});
 
-    const sql = 'INSERT INTO form (Nome, Materia) VALUES (?, ?)';
-    db.query(sql, [nome, materia], (err, result) => {
+    const sql = 'INSERT INTO auth (Nome, Senha, Email, NAcesso) VALUES (?, ?, ?, ?)';
+    db.query(sql, [nome, senha, email, acesso], (err, result) => {
         if (err) {
             console.error('Erro ao inserir no banco:', err.message);
             return res.status(500).send('Erro ao cadastrar');
@@ -53,7 +55,43 @@ app.post('/cadastrar', (req, res) => {
     });
 });
 
-// Iniciar servidor
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
+app.post("/login", (req, res) => {
+    const email = req.body.email;
+    const senha = req.body.senha;
+
+    const sql = 'SELECT Nome, Senha, NAcesso FROM auth WHERE Email = ?';
+    db.query(sql, [email], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar usuário:', err.message);
+            return res.status(500).send('Erro no servidor');
+        }
+
+        if (results.length === 0) {
+            return res.status(401).send('Usuário não encontrado');
+        }
+
+        const usuario = results[0];
+
+        if (usuario.Senha !== senha) {
+            return res.status(401).send('Senha incorreta');
+        }
+
+        const frase = usuario.NAcesso === 1
+            ? 'Bem-vindo, administrador!'
+            : 'Bem-vindo, usuário comum!';
+
+        res.render('acesso', {
+            nome: usuario.Nome,
+            frase
+        });
+    });
+});
+
+// Iniciando server
 app.listen(8050, () => {
     console.log('Servidor rodando em http://localhost:8050');
 });
